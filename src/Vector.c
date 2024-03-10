@@ -2,6 +2,7 @@
 #include "Vector.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 void initVector(Vector* vec, size_t size) {
     vec->data = (double *)malloc(size * sizeof(double));
@@ -21,12 +22,59 @@ void freeVector(Vector* vec) {
     vec->size = 0;
 }
 
-void printVector(Vector* vec) {
+void printVector(const Vector* vec) {
     for (size_t i = 0; i<vec->size; i++) {
         if (i < (vec->size - 1)) {
             printf("%f ", vec->data[i]);
         } else {
             printf("%f\n", vec->data[i]);
         }
+    }
+}
+
+size_t getSize(const Vector* vec) {
+    return vec->size;
+}
+
+double at(const Vector* vec, size_t index) {
+    if (index >=0 && index <= getSize(vec)) {
+        return vec->data[index];
+    } else {
+        fprintf(stderr, "Index out of bounds\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+double calcNorm(Vector* vec, int p) {
+    double norm = 0.0;
+    double sum = 0.0;
+
+    for (size_t i=0; i<getSize(&vec); i++) {
+        sum += pow(fabs(vec->data[i]), p);
+    }
+
+    return pow(sum, 1.0/(double)p);
+}
+
+// double calcNorm(Vector* vec) { // Overload for L2 norm
+//     double norm = 0.0;
+//     double sum = 0.0;
+
+//     for (size_t i=0; i<getSize(&vec); i++) {
+//         sum += pow(fabs(vec->data[i]), 2.0);
+//     }
+
+//     return pow(sum, 1.0/2.0);
+// }
+
+void addVectors(Vector* vec1, Vector* vec2, Vector* result) {
+    // Algebraic sum of two vectors
+    if (getSize(vec1) != getSize(vec2)) {
+        fprintf(stderr, "Vector are incompatible in size");
+        exit(EXIT_FAILURE);
+    }
+
+    for (size_t i=0; i<getSize(result); i++) {
+        result->data[i] = vec1->data[i] + vec2->data[i];
     }
 }

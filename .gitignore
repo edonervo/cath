@@ -66,5 +66,5 @@ _deps
 
 # Build
 build/
-
+.vscode/
 tmp/
