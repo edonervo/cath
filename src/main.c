@@ -45,5 +45,9 @@ int main() {
 
     // printf("Vector 3: \n");
 
+    // ScalarProduct
+    double scProd = ScalarProduct(&vec2, &vec3);
+    printf("Scalar Product: %f\n", scProd);
+
     return EXIT_SUCCESS;
 }

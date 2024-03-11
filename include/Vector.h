@@ -20,4 +20,7 @@ double calcNorm(Vector* vec, int p); // Calculate LP norm
 
 // Algebra operations
 void addVectors(Vector* vec1, Vector* vec2, Vector* result);
+void SubstractVectors(Vector* vec1, Vector* vec2, Vector* result);
+double ScalarProduct(Vector* vec1, Vector* vec2);
+
 #endif /* VECTOR */

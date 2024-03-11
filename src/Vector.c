@@ -69,7 +69,7 @@ double calcNorm(Vector* vec, int p) {
 
 void addVectors(Vector* vec1, Vector* vec2, Vector* result) {
     // Algebraic sum of two vectors
-    if (getSize(vec1) != getSize(vec2)) {
+    if ((getSize(vec1) != getSize(vec2)) || ((getSize(vec1) != getSize(result)))) {
         fprintf(stderr, "Vector are incompatible in size");
         exit(EXIT_FAILURE);
     }
@@ -77,4 +77,29 @@ void addVectors(Vector* vec1, Vector* vec2, Vector* result) {
     for (size_t i=0; i<getSize(result); i++) {
         result->data[i] = vec1->data[i] + vec2->data[i];
     }
+}
+
+void SubstractVectors(Vector* vec1, Vector* vec2, Vector* result) {
+    if ((getSize(vec1) != getSize(vec2)) || ((getSize(vec1) != getSize(result)))) {
+        fprintf(stderr, "Vector are incompatible in size");
+        exit(EXIT_FAILURE);
+    }
+
+    for (size_t i=0; i<getSize(result); i++) {
+        result->data[i] = vec1->data[i] - vec2->data[i];
+    }
+}
+
+double ScalarProduct(Vector* vec1, Vector* vec2) {
+    if (getSize(vec1) != getSize(vec2)) {
+        fprintf(stderr, "Vector are incompatible in size");
+        exit(EXIT_FAILURE);
+    }
+    
+    double result = 0.0;
+    for (size_t i=0; i<getSize(vec1); i++) {
+        result += at(vec1, i) * at(vec2, i);
+    }
+
+    return result;
 }
