@@ -8,6 +8,7 @@ project (cath)
 set (SOURCES
     src/main.c
     src/Vector.c    
+    src/Matrix.c
 )
 
 # Add executable with above sources

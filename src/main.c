@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Vector.h"
+#include "Matrix.h"
 
-int main() {
-    // Vectors
+void testVectors(void) {
+        // Vectors
     // Init
     puts("Defining a vector...\n");
     Vector vec;
@@ -50,4 +51,17 @@ int main() {
     printf("Scalar Product: %f\n", scProd);
 
     return EXIT_SUCCESS;
+}
+
+void testMatrix(void) {
+    // Init Mat
+    Matrix mat;
+
+    initMatrix(&mat, 3, 3);
+    printMatrix(&mat);
+};
+
+int main() {
+    // testVectors();
+    testMatrix();
 }
