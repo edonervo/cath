@@ -1,6 +1,7 @@
 #include "Matrix.h" 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 void initMatrix(Matrix* mat, size_t rows, size_t cols) {
     if (rows <= 0) {
@@ -52,3 +53,53 @@ void printMatrix(Matrix* mat) {
         }
     }
 }
+
+void freeMatrix(Matrix* mat) {
+    for (size_t i=0; i<mat->rows; i++) {
+        free(mat->data[i]);
+    }
+    free(mat->data);
+    mat->data = NULL;
+    mat->rows = 0;
+    mat->cols = 0;
+}
+
+size_t getNumRows(Matrix* mat) {
+    return mat->rows;
+}
+
+size_t getNumCols(Matrix* mat) {
+    return mat->cols;
+}
+
+double calcDeterminant(const Matrix* mat) {
+    // Matrix determinant is only defined for square matrices
+    if (getNumCols(mat) != getNumRows(mat)) {
+        fprintf(stderr, "Matrix is not square");
+    }
+
+    double determinant = 0.0;
+
+    if (getNumRows(mat) == 1) {
+        determinant = mat->data[0][0];
+    } else {
+        // More than one entry of matrix
+        for (size_t i_outer=0; i_outer<mat->rows; i_outer++) {
+            Matrix sub_mat;
+            initMatrix(&sub_mat, mat->rows-1, mat->cols-1);
+            for (size_t i=0; i<mat->rows-1; i++) {
+                for (size_t j=0; j<i_outer; j++) {
+                    sub_mat.data[i][j] = mat->data[i+1][j];
+                }
+                for (size_t j=i_outer; j<mat->rows-1; j++) {
+                    sub_mat.data[i][j] = mat->data[i+1][j+1];
+                }
+            }
+            double sub_matrix_determinant = calcDeterminant(&sub_mat);
+            determinant += pow(-1.0, i_outer) * mat->data[0][i_outer]*sub_matrix_determinant;
+        }
+    }
+
+    return determinant;
+}
+

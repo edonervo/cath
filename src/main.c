@@ -50,6 +50,10 @@ void testVectors(void) {
     double scProd = ScalarProduct(&vec2, &vec3);
     printf("Scalar Product: %f\n", scProd);
 
+    freeVector(&vec);
+    freeVector(&vec1);
+    freeVector(&vec2);
+    freeVector(&vec3);
     return EXIT_SUCCESS;
 }
 
@@ -59,9 +63,11 @@ void testMatrix(void) {
 
     initMatrix(&mat, 3, 3);
     printMatrix(&mat);
+    freeMatrix(&mat);
 };
 
 int main() {
     // testVectors();
     testMatrix();
+
 }
