@@ -1,3 +1,7 @@
+/*Matrix math class Header*/
+#ifndef LINSYS
+#define LINSYS
+
 #include "Vector.h"
 #include "Matrix.h"
 #include <math.h>
@@ -10,3 +14,4 @@ typedef struct LinearSystem
 } LinearSystem;
 
 void initLinSys(LinearSystem* linsys, Matrix* mat, Vector* vec);
+#endif

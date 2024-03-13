@@ -66,6 +66,12 @@ void testMatrix(void) {
     freeMatrix(&mat);
 };
 
+void testLinSys(void) {
+    Matrix mat;
+    initMatrix(&mat, 3, 3);
+
+}
+
 int main() {
     // testVectors();
     testMatrix();
