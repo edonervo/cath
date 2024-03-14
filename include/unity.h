@@ -4,6 +4,7 @@
     [Released under MIT License. Please refer to license.txt for details]
 ========================================== */
 
+
 #ifndef UNITY_FRAMEWORK_H
 #define UNITY_FRAMEWORK_H
 #define UNITY
@@ -18,6 +19,7 @@ extern "C"
 {
 #endif
 
+#define UNITY_INCLUDE_DOUBLE
 #include "unity_internals.h"
 
 /*-------------------------------------------------------
