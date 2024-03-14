@@ -6,9 +6,11 @@ project (cath)
 
 # Cerate a SOURCES variable with a link to all cpp files to compile
 set (SOURCES
-    src/main.c
     src/Vector.c    
     src/Matrix.c
+    src/LinSys.c
+    src/unity.c
+    tests/testVector.c
 )
 
 # Add executable with above sources
