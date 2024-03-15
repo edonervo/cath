@@ -3,7 +3,7 @@
 
 typedef struct Node
 {
-    double coordinate;  
+    double coordinate;
 } Node;
 
 #endif

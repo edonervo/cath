@@ -22,3 +22,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} m)
+
+# Add compiler flags to enable warnings
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wconversion)
