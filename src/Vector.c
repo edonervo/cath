@@ -1,8 +1,11 @@
 /*Vector math class Header*/
 #include "Vector.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
+
 
 void initVector(Vector *vec, int size)
 {
@@ -26,6 +29,17 @@ void initVector(Vector *vec, int size)
     }
 }
 
+bool _checkInitVector(Vector* vec)
+{
+    if (vec->data == NULL) 
+    {
+        return false;
+    } else 
+    {
+        return true;
+    }
+}
+
 void freeVector(Vector *vec)
 {
     free(vec->data);
@@ -45,6 +59,57 @@ void printVector(const Vector *vec)
         {
             printf("%f\n", vec->data[i]);
         }
+    }
+}
+
+void printVectorToFile(const Vector* vec, char* filePath) 
+{
+    if (!_checkInitVector(vec))
+    {
+
+    }
+    FILE* fp;
+    fp = fopen(filePath, "w");
+
+    if (fp == NULL) 
+    {
+        fprintf(stderr, "File opening failed!");
+        return EXIT_FAILURE;
+    }
+
+    for (size_t i = 0; i < vec->size; i++)
+    {
+        if (i < (vec->size - 1))
+        {
+            fprintf(fp, "%f ", vec->data[i]);
+        }
+        else
+        {
+            fprintf(fp, "%f\n", vec->data[i]);
+        }
+    }
+    fclose(fp);
+}
+
+void _checkVectorFileFormat(char* filePath)
+{   
+    FILE* fp;
+    fp = fopen(filePath, "r");
+
+}
+
+void readVectorFromFile(Vector* vec, char* filePath) 
+{
+    _checkVectorFileFormat(filePath);
+}
+
+void randomVector(Vector* vec, int size, double min, double max)
+{
+    initVector(vec, size);
+
+    for (int i=0; i<vec->size; i++) 
+    {
+        vec->data[i] = randomDouble(min, max);
     }
 }
 

@@ -10,6 +10,7 @@ set (SOURCES
     src/Matrix.c
     src/LinSys.c
     src/unity.c
+    src/utils.c
     tests/testVector.c
 )
 
