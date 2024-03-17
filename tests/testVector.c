@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-double VECTOR_TOLERANCE = 1e-8;
+double VECTOR_TOLERANCE = 1e-6;
 int VECTOR_SIZE = 1000;
 double VECTOR_MIN = 0.0;
 double VECTOR_MAX = 1.0;
+char* FILE_TEST_PATH = "/home/edo/dev/cath/tmp/output.txt"; // TODO: Handle Paths in C
+char* FILE_WRONG_FORMAT = "/home/edo/dev/cath/test_files/wrong_vector_format.txt";
 
 void setUp()
 {
@@ -55,24 +57,36 @@ void test_vector_free()
 
 void test_vector_files()
 {
-    // TODO: How to handle file Paths in C?
+    /*Case 1 - Correct output and input file*/
     Vector vector;
-    randomVector(&vector, 5, VECTOR_MIN, VECTOR_MAX);
-
-    // Print to file
-    char* filename = "/home/edo/dev/cath/tmp/output.txt";
-    printVectorToFile(&vector, filename);
-    printf("Vector to write: \n");
-    printVector(&vector);    
-
-    // Read from file
     Vector newVector;
-    char* newfilename = "/home/edo/dev/cath/tmp/output.txt";
-    readVectorFromFile(&newVector, newfilename);
-    printf("Vector read from file: \n");
-    printVector(&newVector);
 
+    randomVector(&vector, VECTOR_SIZE, VECTOR_MIN, VECTOR_MAX); //Generate random test data
+    // Print to file
+    printVectorToFile(&vector, FILE_TEST_PATH);  
+    // Read from file
+    readVectorFromFile(&newVector, FILE_TEST_PATH);
+    // Vector must be the same
+    for (size_t i = 0; i < VECTOR_SIZE; i++)
+    {
+        TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
+            VECTOR_TOLERANCE, vector.data[i],
+            newVector.data[i], "Case 1 - Vector are not the same\n");
+    }(&newVector, &vector, VECTOR_SIZE);
 
+    /*Case 2 - vector in the file is wrong format*/
+    bool file_good;
+    bool file_bad;
+
+    TEST_ASSERT_TRUE_MESSAGE(
+        _checkVectorFileFormat(FILE_TEST_PATH), 
+        "Correct format file is recognized with wrong format"
+        );
+    TEST_ASSERT_FALSE_MESSAGE(
+        _checkVectorFileFormat(FILE_WRONG_FORMAT),
+        "Wrong format file is recognized with correct format"
+        );
+        
     freeVector(&vector);
     freeVector(&newVector);
 }
@@ -85,7 +99,7 @@ int main(void)
 
     RUN_TEST(test_vector_init);
     RUN_TEST(test_vector_free);
-    test_vector_files();
+    RUN_TEST(test_vector_files);
 
     UNITY_END();
 

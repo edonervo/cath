@@ -214,7 +214,7 @@ double calcNorm(const Vector *vec, int p)
     double norm = 0.0;
     double sum = 0.0;
 
-    for (size_t i = 0; i < getSize(&vec); i++)
+    for (size_t i = 0; i < vec->size; i++)
     {
         sum += pow(fabs(vec->data[i]), p);
     }
@@ -242,7 +242,7 @@ void addVectors(Vector *vec1, Vector *vec2, Vector *result)
         exit(EXIT_FAILURE);
     }
 
-    for (size_t i = 0; i < getSize(result); i++)
+    for (size_t i = 0; i < vec1->size; i++)
     {
         result->data[i] = vec1->data[i] + vec2->data[i];
     }
@@ -256,7 +256,7 @@ void SubstractVectors(Vector *vec1, Vector *vec2, Vector *result)
         exit(EXIT_FAILURE);
     }
 
-    for (size_t i = 0; i < getSize(result); i++)
+    for (size_t i = 0; i < vec1->size; i++)
     {
         result->data[i] = vec1->data[i] - vec2->data[i];
     }

@@ -15,6 +15,7 @@ typedef struct Vector
 // private (?)
 void initVector(Vector* vec, int size);
 bool _checkInitVector(Vector* vec);
+bool _checkVectorFileFormat(char* filePath);
 void freeVector(Vector* vec);
 
 // IO
