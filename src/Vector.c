@@ -98,7 +98,6 @@ bool _checkVectorFileFormat(char* filePath)
     fp = fopen(filePath, "r+");
     if (fp == NULL) {
         perror("Error");
-        // fprintf(stderr, "Failed to open file! Exiting...\n");
         exit(EXIT_FAILURE);
     }
 
@@ -191,14 +190,9 @@ void randomVector(Vector* vec, int size, double min, double max)
     }
 }
 
-int getSize(const Vector *vec)
-{
-    return vec->size;
-}
-
 double at(const Vector *vec, int index)
 {
-    if (index >= 0 && index <= getSize(vec))
+    if (index >= 0 && index <= vec->size)
     {
         return vec->data[index];
     }
@@ -210,8 +204,8 @@ double at(const Vector *vec, int index)
 }
 
 double calcNorm(const Vector *vec, int p)
+//TODO: better handle Lp inf norm
 {
-    double norm = 0.0;
     double sum = 0.0;
 
     for (size_t i = 0; i < vec->size; i++)
@@ -219,24 +213,21 @@ double calcNorm(const Vector *vec, int p)
         sum += pow(fabs(vec->data[i]), p);
     }
 
-    return pow(sum, 1.0 / (double)p);
+    if (!isinf(sum))
+    {
+        return pow(sum, 1.0 / (double)p);
+
+    } else
+    {
+        fprintf(stderr, "Lp-inf was Computed assuming the high p-value of input!\n");
+        return findAbsMax(vec);
+    }
 }
-
-// double calcNorm(Vector* vec) { // Overload for L2 norm
-//     double norm = 0.0;
-//     double sum = 0.0;
-
-//     for (size_t i=0; i<getSize(&vec); i++) {
-//         sum += pow(fabs(vec->data[i]), 2.0);
-//     }
-
-//     return pow(sum, 1.0/2.0);
-// }
 
 void addVectors(Vector *vec1, Vector *vec2, Vector *result)
 {
     // Algebraic sum of two vectors
-    if ((getSize(vec1) != getSize(vec2)) || ((getSize(vec1) != getSize(result))))
+    if ((vec1->size != vec2->size) || ((vec1->size != result->size)))
     {
         fprintf(stderr, "Vector are incompatible in size");
         exit(EXIT_FAILURE);
@@ -250,7 +241,7 @@ void addVectors(Vector *vec1, Vector *vec2, Vector *result)
 
 void SubstractVectors(Vector *vec1, Vector *vec2, Vector *result)
 {
-    if ((getSize(vec1) != getSize(vec2)) || ((getSize(vec1) != getSize(result))))
+    if ((vec1->size != vec2->size) || ((vec1->size != result->size)))
     {
         fprintf(stderr, "Vector are incompatible in size");
         exit(EXIT_FAILURE);
@@ -264,17 +255,77 @@ void SubstractVectors(Vector *vec1, Vector *vec2, Vector *result)
 
 double ScalarProduct(Vector *vec1, Vector *vec2)
 {
-    if (getSize(vec1) != getSize(vec2))
+    if (vec1->size != vec2->size)
     {
         fprintf(stderr, "Vector are incompatible in size");
         exit(EXIT_FAILURE);
     }
 
     double result = 0.0;
-    for (size_t i = 0; i < getSize(vec1); i++)
+    for (size_t i = 0; i < vec1->size; i++)
     {
         result += at(vec1, i) * at(vec2, i);
     }
 
     return result;
+}
+
+double findMax(Vector* vec) 
+{
+    _checkInitVector(vec);
+    double max = vec->data[0];
+    for (size_t i=1; i<vec->size; i++)  
+    {
+        if (vec->data[i]>max)
+        {
+            max = vec->data[i];
+        }
+    }
+
+    return max;
+}
+
+double findAbsMax(Vector* vec)
+{
+    _checkInitVector(vec);
+    double abs_max = fabs(vec->data[0]);
+    for (size_t i=1; i<vec->size; i++)  
+    {
+        if (fabs(vec->data[i])>abs_max)
+        {
+            abs_max = vec->data[i];
+        }
+    }
+
+    return abs_max;
+}
+
+double findMin(Vector* vec) 
+{
+    _checkInitVector(vec);
+    double min = vec->data[0];
+    for (size_t i=1; i<vec->size; i++)  
+    {
+        if (vec->data[i]<min)
+        {
+            min = vec->data[i];
+        }
+    }
+
+    return min;
+}
+
+double findAbsMin(Vector* vec)
+{
+    _checkInitVector(vec);
+    double abs_min = fabs(vec->data[0]);
+    for (size_t i=0; i<vec->size; i++)  
+    {
+        if (fabs(vec->data[i])<fabs(vec->data[i]))
+        {
+            abs_min = vec->data[i];
+        }
+    }
+
+    return abs_min;
 }
