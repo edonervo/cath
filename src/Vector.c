@@ -73,8 +73,8 @@ void printVectorToFile(const Vector* vec, char* filePath)
 
     if (fp == NULL) 
     {
-        fprintf(stderr, "File opening failed!");
-        return EXIT_FAILURE;
+        perror("Error: ");
+        exit(EXIT_FAILURE);
     }
 
     for (size_t i = 0; i < vec->size; i++)
@@ -91,16 +91,94 @@ void printVectorToFile(const Vector* vec, char* filePath)
     fclose(fp);
 }
 
-void _checkVectorFileFormat(char* filePath)
+bool _checkVectorFileFormat(char* filePath)
 {   
+    /*Vector must be saved in a single line with space-sep double*/
     FILE* fp;
-    fp = fopen(filePath, "r");
+    fp = fopen(filePath, "r+");
+    if (fp == NULL) {
+        perror("Error");
+        // fprintf(stderr, "Failed to open file! Exiting...\n");
+        exit(EXIT_FAILURE);
+    }
 
+    int c;
+    bool previousWasSpace = false;
+    bool previousWasDouble = false;
+
+    while ((c = fgetc(fp)) != EOF)
+    {
+        if (c == '\n') 
+        {
+            // Check if the last character before newline was a Double
+            if (!previousWasDouble) 
+            {
+                fclose(fp);
+                return false;
+            }
+            break;
+        } else if (c == ' ')
+        {
+            if (previousWasSpace || !previousWasDouble)
+            {
+                fclose(fp);
+                return false;
+            }
+            previousWasSpace = true;
+        } else if ((c >= '0' && c<='9') || c == '.' || c == '-') 
+        {
+            previousWasDouble = true;
+            previousWasSpace = false;
+        } else 
+        {
+            // Non-double char is found
+            fclose(fp);
+            return false;
+        }
+    }
+    fclose(fp);
+    return true;
 }
 
 void readVectorFromFile(Vector* vec, char* filePath) 
 {
-    _checkVectorFileFormat(filePath);
+    if (!_checkVectorFileFormat(filePath))
+    {
+        fprintf(stderr, "File %s is not in correct format!", filePath);
+        exit(EXIT_FAILURE);
+    }
+
+    FILE* fp = fopen(filePath, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open file %s! Exiting...\n", filePath);
+        exit(EXIT_FAILURE);
+    }
+
+    // Determine vector length
+    int vectorSize = 0;
+    double num;
+    while (true)
+    {
+        
+        if (fscanf(fp, "%lf", &num) != EOF)
+        {   
+            vectorSize ++;
+        } else
+        {
+            // EOF reached
+            break;
+        }
+    }
+    fclose(fp);
+    
+    // Save data to vector known length
+    fp = fopen(filePath, "r");
+    initVector(vec, vectorSize);
+    for (size_t i=0; i<vectorSize; i++)
+    {   
+        fscanf(fp, "%lf", &num);
+        vec->data[i] = num;
+    }
 }
 
 void randomVector(Vector* vec, int size, double min, double max)

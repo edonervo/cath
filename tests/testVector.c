@@ -55,17 +55,26 @@ void test_vector_free()
 
 void test_vector_files()
 {
+    // TODO: How to handle file Paths in C?
     Vector vector;
     randomVector(&vector, 5, VECTOR_MIN, VECTOR_MAX);
 
     // Print to file
-    char* filename = "tmp/output.txt";
+    char* filename = "/home/edo/dev/cath/tmp/output.txt";
     printVectorToFile(&vector, filename);
+    printf("Vector to write: \n");
+    printVector(&vector);    
 
     // Read from file
+    Vector newVector;
+    char* newfilename = "/home/edo/dev/cath/tmp/output.txt";
+    readVectorFromFile(&newVector, newfilename);
+    printf("Vector read from file: \n");
+    printVector(&newVector);
+
 
     freeVector(&vector);
-
+    freeVector(&newVector);
 }
 
 int main(void)
