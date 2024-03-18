@@ -3,6 +3,8 @@
 #define VECTOR
 
 #include <stddef.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 typedef struct Vector
 {
@@ -10,17 +12,30 @@ typedef struct Vector
     size_t size;
 } Vector;
 
-void initVector(Vector* vec, size_t size);
-void printVector(const Vector* vec);
+// private (?)
+void initVector(Vector* vec, int size);
+bool _checkInitVector(Vector* vec);
+bool _checkVectorFileFormat(char* filePath);
 void freeVector(Vector* vec);
-size_t getSize(const Vector* vec);
-double at(const Vector* vec, size_t index);
 
-double calcNorm(Vector* vec, int p); // Calculate LP norm
+// IO
+void printVector(const Vector* vec);
+void printVectorToFile(const Vector* vec, char* filePath);
+void readVectorFromFile(Vector* vec, char* filePath);
 
-// Algebra operations
+// utils
+void randomVector(Vector* vec, int size, double min, double max);
+
+// Math
+double findMax(Vector* vec);
+double findAbsMax(Vector* vec);
+double findMin(Vector* vec);
+double findAbsMin(Vector* vec);
 void addVectors(Vector* vec1, Vector* vec2, Vector* result);
-void SubstractVectors(Vector* vec1, Vector* vec2, Vector* result);
-double ScalarProduct(Vector* vec1, Vector* vec2);
+void substractVectors(Vector* vec1, Vector* vec2, Vector* result);
+void invertSign(Vector* vec);
+void multiplyByScalar(Vector* vec, double scalar);
+double scalarProduct(Vector* vec1, Vector* vec2);
+double calcNorm(const Vector* vec, int p); // Calculate LP norm
 
 #endif /* VECTOR */

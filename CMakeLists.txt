@@ -6,9 +6,11 @@ project (cath)
 
 # Cerate a SOURCES variable with a link to all cpp files to compile
 set (SOURCES
-    src/main.c
     src/Vector.c    
     src/Matrix.c
+    src/LinSys.c
+    src/utils.c
+    src/main.c
 )
 
 # Add executable with above sources
@@ -20,3 +22,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} m)
+
+# Add compiler flags to enable warnings
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wconversion)
