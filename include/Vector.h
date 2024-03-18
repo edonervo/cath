@@ -25,7 +25,6 @@ void readVectorFromFile(Vector* vec, char* filePath);
 
 // utils
 void randomVector(Vector* vec, int size, double min, double max);
-double at(const Vector* vec, int index);
 
 // Math
 double findMax(Vector* vec);
@@ -33,8 +32,10 @@ double findAbsMax(Vector* vec);
 double findMin(Vector* vec);
 double findAbsMin(Vector* vec);
 void addVectors(Vector* vec1, Vector* vec2, Vector* result);
-void SubstractVectors(Vector* vec1, Vector* vec2, Vector* result);
-double ScalarProduct(Vector* vec1, Vector* vec2);
+void substractVectors(Vector* vec1, Vector* vec2, Vector* result);
+void invertSign(Vector* vec);
+void multiplyByScalar(Vector* vec, double scalar);
+double scalarProduct(Vector* vec1, Vector* vec2);
 double calcNorm(const Vector* vec, int p); // Calculate LP norm
 
 #endif /* VECTOR */

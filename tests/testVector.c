@@ -103,7 +103,6 @@ void test_vector_norm()
     Vector NullVector;
     /*Case 1 - L1 norm*/ // Todo: handle file path much bettern than this
     readVectorFromFile(&L1Vector, strcat(BASE_FILE_TESTS, "/vectors/norm/L1_norm.txt"));
-    printf("L1 norm: %lf\n", calcNorm(&L1Vector, 1));
     TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
         VECTOR_TOLERANCE,
         17.3,
@@ -113,7 +112,6 @@ void test_vector_norm()
 
     /*Case 2 - L2 norm*/
     readVectorFromFile(&L2Vector, "/home/edo/dev/cath/test_files/vectors/norm/L2_norm.txt");
-    printf("L2 norm: %lf\n", calcNorm(&L2Vector, 2));
     TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
         VECTOR_TOLERANCE,
         8.566796,
@@ -123,7 +121,6 @@ void test_vector_norm()
 
     /*Case 3 - Linf norm, is the max(fabs(x_i))*/ 
     readVectorFromFile(&LinfVector, "/home/edo/dev/cath/test_files/vectors/norm/Linf_norm.txt");
-    printf("Linf norm: %lf\n", calcNorm(&LinfVector, 1000));
     TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
         VECTOR_TOLERANCE,
         findAbsMax(&LinfVector),
@@ -151,19 +148,91 @@ void test_vector_norm()
         calcNorm(&NullVector, 1000),
         "Linf null norm calculation failed"
     );
+
+    freeVector(&L1Vector);
+    freeVector(&L2Vector);
+    freeVector(&LinfVector);
+    freeVector(&NullVector);
+}
+
+void test_vector_algebra()
+{
+    // Test sum of vector
+    Vector sumVec1;
+    Vector sumVec2;
+    Vector sumActual;
+    Vector sumExpected;
+    readVectorFromFile(&sumVec1, "/home/edo/dev/cath/test_files/vectors/algebra/sum_vec1.txt");
+    readVectorFromFile(&sumVec2, "/home/edo/dev/cath/test_files/vectors/algebra/sum_vec2.txt");
+    readVectorFromFile(&sumExpected, "/home/edo/dev/cath/test_files/vectors/algebra/sum_result.txt");
+    initVector(&sumActual, sumExpected.size);
+    addVectors(&sumVec1, &sumVec2, &sumActual);
+    TEST_ASSERT_DOUBLE_ARRAY_WITHIN(VECTOR_TOLERANCE, sumExpected.data, sumActual.data, 5);
+    freeVector(&sumVec1);
+    freeVector(&sumVec2);
+    freeVector(&sumActual);
+    freeVector(&sumExpected);
+
+    // Test sub of vector
+    Vector subVec1;
+    Vector subVec2;
+    Vector subActual;
+    Vector subExpected;
+    readVectorFromFile(&subVec1, "/home/edo/dev/cath/test_files/vectors/algebra/sub_vec1.txt");
+    readVectorFromFile(&subVec2, "/home/edo/dev/cath/test_files/vectors/algebra/sub_vec2.txt");
+    readVectorFromFile(&subExpected, "/home/edo/dev/cath/test_files/vectors/algebra/sub_result.txt");
+    initVector(&subActual, subExpected.size);
+    substractVectors(&subVec1, &subVec2, &subActual);
+    TEST_ASSERT_DOUBLE_ARRAY_WITHIN(VECTOR_TOLERANCE, subExpected.data, subActual.data, 5);
+    freeVector(&subVec1);
+    freeVector(&subVec2);
+    freeVector(&subActual);
+    freeVector(&subExpected);
+
+    // Test Negative
+    Vector negVector;
+    Vector negVectorExpected;
+    readVectorFromFile(&negVector, "/home/edo/dev/cath/test_files/vectors/algebra/neg_vec.txt");
+    readVectorFromFile(&negVectorExpected, "/home/edo/dev/cath/test_files/vectors/algebra/neg_vec_result.txt");
+    invertSign(&negVector);
+    TEST_ASSERT_DOUBLE_ARRAY_WITHIN(VECTOR_TOLERANCE, negVectorExpected.data, negVector.data, 5);
+    freeVector(&negVector);
+    freeVector(&negVectorExpected);
+
+    // Test product with a sclar
+    Vector vecWithScalar;
+    Vector vecWithScalarExpected;
+    readVectorFromFile(&vecWithScalar, "/home/edo/dev/cath/test_files/vectors/algebra/vec_with_scalar.txt");
+    readVectorFromFile(&vecWithScalarExpected, "/home/edo/dev/cath/test_files/vectors/algebra/vec_with_scalar_result.txt");
+    double scalar = 2.0;
+    multiplyByScalar(&vecWithScalar, scalar);
+    TEST_ASSERT_DOUBLE_ARRAY_WITHIN(VECTOR_TOLERANCE, vecWithScalar.data, vecWithScalarExpected.data, 5);
+    freeVector(&vecWithScalar);
+    freeVector(&vecWithScalarExpected);
+    
+
+    // Test Scalar Product (Dot-product)
+    Vector scalarProductVec1;
+    Vector scalarProductVec2;
+    double scalarProductExpected = 47.5;
+    readVectorFromFile(&scalarProductVec1, "/home/edo/dev/cath/test_files/vectors/algebra/scalar_prod_vec1.txt");
+    readVectorFromFile(&scalarProductVec2, "/home/edo/dev/cath/test_files/vectors/algebra/scalar_prod_vec2.txt");
+    double scalarProductActual = scalarProduct(&scalarProductVec1, &scalarProductVec2);
+    TEST_ASSERT_DOUBLE_WITHIN(VECTOR_TOLERANCE, scalarProductExpected, scalarProductActual);
+    freeVector(&scalarProductVec1);
+    freeVector(&scalarProductVec2);
 }
 
 
 int main(void)
 {
     UNITY_BEGIN();
-
-    puts("Vector Tests");
-
+    
     RUN_TEST(test_vector_init);
     RUN_TEST(test_vector_free);
     RUN_TEST(test_vector_files);
     RUN_TEST(test_vector_norm);
+    RUN_TEST(test_vector_algebra);
 
     UNITY_END();
 

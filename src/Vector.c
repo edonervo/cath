@@ -190,19 +190,6 @@ void randomVector(Vector* vec, int size, double min, double max)
     }
 }
 
-double at(const Vector *vec, int index)
-{
-    if (index >= 0 && index <= vec->size)
-    {
-        return vec->data[index];
-    }
-    else
-    {
-        fprintf(stderr, "Index out of bounds\n");
-        exit(EXIT_FAILURE);
-    }
-}
-
 double calcNorm(const Vector *vec, int p)
 //TODO: better handle Lp inf norm
 {
@@ -224,6 +211,32 @@ double calcNorm(const Vector *vec, int p)
     }
 }
 
+void invertSign(Vector* vec)
+{
+    if (!_checkInitVector(vec))
+    {
+        fprintf(stderr, "Vector is not initialized, exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i=0; i<vec->size; i++)
+    {
+        vec->data[i] = -1 * vec->data[i];
+    }
+}
+
+void multiplyByScalar(Vector* vec, double scalar)
+{
+    if (!_checkInitVector(vec))
+    {
+        fprintf(stderr, "Vector is not initialized, exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i=0; i<vec->size; i++)
+    {
+        vec->data[i] = scalar * vec->data[i];
+    }
+}
+
 void addVectors(Vector *vec1, Vector *vec2, Vector *result)
 {
     // Algebraic sum of two vectors
@@ -239,7 +252,7 @@ void addVectors(Vector *vec1, Vector *vec2, Vector *result)
     }
 }
 
-void SubstractVectors(Vector *vec1, Vector *vec2, Vector *result)
+void substractVectors(Vector *vec1, Vector *vec2, Vector *result)
 {
     if ((vec1->size != vec2->size) || ((vec1->size != result->size)))
     {
@@ -253,7 +266,7 @@ void SubstractVectors(Vector *vec1, Vector *vec2, Vector *result)
     }
 }
 
-double ScalarProduct(Vector *vec1, Vector *vec2)
+double scalarProduct(Vector *vec1, Vector *vec2)
 {
     if (vec1->size != vec2->size)
     {
@@ -264,7 +277,7 @@ double ScalarProduct(Vector *vec1, Vector *vec2)
     double result = 0.0;
     for (size_t i = 0; i < vec1->size; i++)
     {
-        result += at(vec1, i) * at(vec2, i);
+        result += vec1->data[i] * vec2->data[i];
     }
 
     return result;
