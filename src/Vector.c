@@ -66,7 +66,8 @@ void printVectorToFile(const Vector* vec, char* filePath)
 {
     if (!_checkInitVector(vec))
     {
-
+        fprintf(stderr, "Vector is not initialized! Exiting...");
+        exit(EXIT_FAILURE);
     }
     FILE* fp;
     fp = fopen(filePath, "w");

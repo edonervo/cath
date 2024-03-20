@@ -44,7 +44,23 @@ void initMatrix(Matrix *mat, size_t rows, size_t cols)
     }
 }
 
-void printMatrix(Matrix *mat)
+bool _checkInitMatrix(Matrix* mat)
+{
+    for (size_t i=0; i<mat->rows; i++)
+    {
+        if (mat->data[i] == NULL)
+        {
+            return false;
+        }
+    }
+    if (mat->data == NULL)
+    {
+        return false;
+    }
+    return true;
+}
+
+void printMatrix(const Matrix *mat)
 {
     if (mat->data == NULL)
     {
@@ -68,6 +84,99 @@ void printMatrix(Matrix *mat)
     }
 }
 
+void printMatrixtoFile(const Matrix* mat, char* filePath)
+{
+    if (!_checkInitMatrix(mat))
+    {
+        fprintf(stderr, "Matrix is not initialized! Exiting...");
+        exit(EXIT_FAILURE);
+    }
+    FILE* fp = fopen(filePath, "w");
+    if (fp == NULL) 
+    {
+        perror("Error: ");
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i = 0; i < mat->rows; i++)
+    {
+        for (size_t j = 0; j < mat->cols; j++)
+        {
+            if (j < mat->cols - 1)
+            {
+                fprintf(fp, "%f ", mat->data[i][j]);
+            }
+            else
+            {
+                fprintf(fp, "%f\n", mat->data[i][j]);
+            }
+        }
+    }
+    fclose(fp);
+}
+
+bool _checkMatrixFileFormat(char* filePath)
+{
+    FILE* fp = fopen(filePath, "r");
+    if (fp == NULL)
+    {
+        perror("Error Opening File: ");
+        return false;
+    }
+
+    // Variables to track format requirements
+    bool rowsColsRead = false; // Ensures each row has the same size
+    size_t rows = 0;
+    size_t cols = 0;
+
+    // Read the file until EOF is reached
+    int c;
+    bool previousWasSpace = false;
+    bool previousWasDouble = false;
+    size_t currentCols = 0;
+    while ((c = fgetc(fp)) != EOF)      
+    {
+        if (c == '\n')
+        {
+            // Previous char must be part of a double
+            if (!previousWasDouble || !rowsColsRead)
+            {
+                fclose(fp);
+                return false;
+            }
+            rowsColsRead = true;
+            rows++;
+            if (cols == 0)
+            {
+                cols = currentCols;
+            } else if (currentCols != cols)
+            {
+                fclose(fp);
+                return false;
+            }
+            currentCols = 0;
+            previousWasDouble = false;
+            previousWasSpace = false;
+        } else if (c == ' ')
+        {
+            if (previousWasSpace || !previousWasDouble || !rowsColsRead)
+            {
+                fclose(fp);
+                return false;
+            }
+            previousWasSpace = true;
+        } else if ((c >= '0' && c <= '9') || c == '.' || c == '-')
+        {
+            previousWasDouble = true;
+            previousWasSpace = false;
+            currentCols++;
+        } else {
+            // Non-double char is found
+            fclose(fp);
+            return false;
+        }
+    }
+}   
+
 void freeMatrix(Matrix *mat)
 {
     for (size_t i = 0; i < mat->rows; i++)
@@ -78,16 +187,6 @@ void freeMatrix(Matrix *mat)
     mat->data = NULL;
     mat->rows = 0;
     mat->cols = 0;
-}
-
-size_t getNumRows(const Matrix *mat)
-{
-    return mat->rows;
-}
-
-size_t getNumCols(const Matrix *mat)
-{
-    return mat->cols;
 }
 
 double calcDeterminant(const Matrix *mat)
