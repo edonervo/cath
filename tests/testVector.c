@@ -64,9 +64,6 @@ void test_vector_files()
     //(&newVector, &vector, VECTOR_SIZE);
 
     /*Case 2 - vector in the file is wrong format*/
-    bool file_good;
-    bool file_bad;
-
     TEST_ASSERT_TRUE_MESSAGE(
         _checkVectorFileFormat(FILE_TEST_PATH), 
         "Correct format file is recognized with wrong format"

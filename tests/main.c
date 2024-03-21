@@ -35,6 +35,7 @@ int main(void)
     RUN_TEST(test_matrix_init);
     RUN_TEST(test_matrix_free);
     RUN_TEST(test_matrix_files);
+    RUN_TEST(test_matrix_algebra);
 
     UNITY_END();
 
