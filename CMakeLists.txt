@@ -12,6 +12,8 @@ set (SOURCES
     src/unity.c
     src/utils.c
     tests/testVector.c
+    tests/testMatrix.c
+    tests/main.c
 )
 
 # Add executable with above sources

@@ -189,17 +189,57 @@ void freeMatrix(Matrix *mat)
     mat->cols = 0;
 }
 
+void readMatrixFromFile(Matrix* mat, char* filePath)
+{
+    if (_checkMatrixFileFormat(filePath))
+    {
+        fprintf(stderr, "File %s is not in correct format!", filePath);
+        exit(EXIT_FAILURE);
+    }
+
+    FILE* fp = fopen(filePath, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open file %s! Exiting...\n", filePath);
+        exit(EXIT_FAILURE);
+    }
+
+    // Determine Matrix size before init
+    int cols = 0;
+    int rows = 0;
+    double num;
+    while(true) 
+    {
+        if (fscanf(fp, "%lf", &num) != EOF)
+        {
+            if (fgetc(fp) == "\n") 
+            {
+                rows++;
+            } else
+            {
+                cols++;
+            }
+        } else
+        {
+            // EOF reached
+            break;
+        }
+    }
+
+    // Assign file to Matrix
+    fclose(fp);
+}
+
 double calcDeterminant(const Matrix *mat)
 {
     // Matrix determinant is only defined for square matrices
-    if (getNumCols(mat) != getNumRows(mat))
+    if (mat->rows != mat->cols)
     {
         fprintf(stderr, "Matrix is not square");
     }
 
     double determinant = 0.0;
 
-    if (getNumRows(mat) == 1)
+    if (mat->rows == 1)
     {
         determinant = mat->data[0][0];
     }

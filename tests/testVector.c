@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "utils.h"
 #include "Vector.h"
+#include "testVector.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -14,22 +15,6 @@ double VECTOR_MAX = 1.0;
 char* FILE_TEST_PATH = "/home/edo/dev/cath/tmp/output.txt"; // TODO: Handle Paths in C
 char* FILE_WRONG_FORMAT = "/home/edo/dev/cath/test_files/vectors/wrong_vector_format.txt";
 char BASE_FILE_TESTS[100] = "/home/edo/dev/cath/test_files";
-
-void setUp()
-{
-    /*
-    The setUp function can contain anything
-    you would like to run before each test.
-    */
-}
-
-void tearDown()
-{
-    /*
-    The tearDown function can contain anything
-    you would like to run after each test
-    */
-}
 
 void test_vector_init()
 {
@@ -221,20 +206,4 @@ void test_vector_algebra()
     TEST_ASSERT_DOUBLE_WITHIN(VECTOR_TOLERANCE, scalarProductExpected, scalarProductActual);
     freeVector(&scalarProductVec1);
     freeVector(&scalarProductVec2);
-}
-
-
-int main(void)
-{
-    UNITY_BEGIN();
-    
-    RUN_TEST(test_vector_init);
-    RUN_TEST(test_vector_free);
-    RUN_TEST(test_vector_files);
-    RUN_TEST(test_vector_norm);
-    RUN_TEST(test_vector_algebra);
-
-    UNITY_END();
-
-    return EXIT_SUCCESS;
 }

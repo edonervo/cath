@@ -20,11 +20,10 @@ void freeMatrix(Matrix* mat);
 // IO
 void printMatrix(const Matrix* mat);
 void printMatrixtoFile(const Matrix* mat, char* filePath);
-// void readMatrixFromFile(Matrix* mat, char* filePath);
+void readMatrixFromFile(Matrix* mat, char* filePath);
 
 // Math
 double calcDeterminant(const Matrix* mat);
-// double calcNorm(const Matrix* mat);
-// double calcEigenvalues(const Matrix* mat);
-
+//double calcNorm(const Matrix* mat, int p); // TODO: https://mathworld.wolfram.com/MatrixNorm.html
+//double calcEigenvalues(const Matrix* mat); // TODO:
 #endif /* Matrix */
