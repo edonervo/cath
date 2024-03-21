@@ -31,8 +31,10 @@ int main(void)
     RUN_TEST(test_vector_norm);
     RUN_TEST(test_vector_algebra);
 
-    // Vector
+    // Matrix
     RUN_TEST(test_matrix_init);
+    RUN_TEST(test_matrix_free);
+    RUN_TEST(test_matrix_files);
 
     UNITY_END();
 

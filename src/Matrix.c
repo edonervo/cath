@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "utils.h"
 
 void initMatrix(Matrix *mat, size_t rows, size_t cols)
 {
@@ -114,7 +115,7 @@ void printMatrixtoFile(const Matrix* mat, char* filePath)
     fclose(fp);
 }
 
-bool _checkMatrixFileFormat(char* filePath)
+bool _checkMatrixFileFormat(char* filePath, int* rows, int* cols)
 {
     FILE* fp = fopen(filePath, "r");
     if (fp == NULL)
@@ -123,58 +124,58 @@ bool _checkMatrixFileFormat(char* filePath)
         return false;
     }
 
-    // Variables to track format requirements
-    bool rowsColsRead = false; // Ensures each row has the same size
-    size_t rows = 0;
-    size_t cols = 0;
+    *rows = 0;
+    *cols = 0;
 
     // Read the file until EOF is reached
     int c;
     bool previousWasSpace = false;
     bool previousWasDouble = false;
-    size_t currentCols = 0;
+    size_t maxCols = 0; // Keep track the matrix is uniform
     while ((c = fgetc(fp)) != EOF)      
     {
         if (c == '\n')
         {
-            // Previous char must be part of a double
-            if (!previousWasDouble || !rowsColsRead)
+            // Previous char must be part of a double and not a space
+            if (!previousWasDouble || previousWasSpace)
             {
                 fclose(fp);
                 return false;
             }
-            rowsColsRead = true;
-            rows++;
-            if (cols == 0)
+            // check columns consistency
+            if (*rows == 0)
             {
-                cols = currentCols;
-            } else if (currentCols != cols)
+                maxCols = *cols;
+            } else if ((*rows>0) && (*cols != maxCols))
             {
                 fclose(fp);
                 return false;
             }
-            currentCols = 0;
             previousWasDouble = false;
             previousWasSpace = false;
+            *rows = *rows + 1;
+            *cols = 0;
         } else if (c == ' ')
         {
-            if (previousWasSpace || !previousWasDouble || !rowsColsRead)
+            if (previousWasSpace || !previousWasDouble)
             {
                 fclose(fp);
                 return false;
             }
             previousWasSpace = true;
+            *cols = *cols+1;
         } else if ((c >= '0' && c <= '9') || c == '.' || c == '-')
         {
             previousWasDouble = true;
             previousWasSpace = false;
-            currentCols++;
         } else {
             // Non-double char is found
             fclose(fp);
             return false;
         }
     }
+    *cols = maxCols+1;
+    return true;
 }   
 
 void freeMatrix(Matrix *mat)
@@ -191,7 +192,9 @@ void freeMatrix(Matrix *mat)
 
 void readMatrixFromFile(Matrix* mat, char* filePath)
 {
-    if (_checkMatrixFileFormat(filePath))
+    int rows = 0;
+    int cols = 0;
+    if (!_checkMatrixFileFormat(filePath, &rows, &cols))
     {
         fprintf(stderr, "File %s is not in correct format!", filePath);
         exit(EXIT_FAILURE);
@@ -203,30 +206,29 @@ void readMatrixFromFile(Matrix* mat, char* filePath)
         exit(EXIT_FAILURE);
     }
 
-    // Determine Matrix size before init
-    int cols = 0;
-    int rows = 0;
-    double num;
-    while(true) 
+    // Assign file to Matrix
+    initMatrix(mat, rows, cols);
+    // double num;
+    for (size_t i=0; i<mat->rows; i++)
     {
-        if (fscanf(fp, "%lf", &num) != EOF)
+        for (size_t j=0; j<mat->cols; j++)
         {
-            if (fgetc(fp) == "\n") 
-            {
-                rows++;
-            } else
-            {
-                cols++;
-            }
-        } else
+            fscanf(fp, "%lf", &mat->data[i][j]);
+        }
+    }    
+    fclose(fp);
+}
+
+void randomMatrix(Matrix* mat, int rows, int cols, double min, double max)
+{
+    initMatrix(mat, rows, cols);
+    for (size_t i=0; i<rows; i++)
+    {
+        for (size_t j=0; j<cols; j++)
         {
-            // EOF reached
-            break;
+            mat->data[i][j] = randomDouble(min, max);
         }
     }
-
-    // Assign file to Matrix
-    fclose(fp);
 }
 
 double calcDeterminant(const Matrix *mat)

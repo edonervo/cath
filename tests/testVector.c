@@ -60,7 +60,8 @@ void test_vector_files()
         TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
             VECTOR_TOLERANCE, vector.data[i],
             newVector.data[i], "Case 1 - Vector are not the same\n");
-    }(&newVector, &vector, VECTOR_SIZE);
+    }
+    //(&newVector, &vector, VECTOR_SIZE);
 
     /*Case 2 - vector in the file is wrong format*/
     bool file_good;
