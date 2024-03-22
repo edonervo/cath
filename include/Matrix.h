@@ -27,4 +27,5 @@ void randomMatrix(Matrix* mat, int rows, int cols, double min, double max);
 double calcDeterminant(const Matrix* mat);
 //double calcNorm(const Matrix* mat, int p); // TODO: https://mathworld.wolfram.com/MatrixNorm.html
 //double calcEigenvalues(const Matrix* mat); // TODO:
+// invMattrix(Matrix* mat); // TODO, take into account singular matrix
 #endif /* Matrix */
