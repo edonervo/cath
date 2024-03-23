@@ -49,6 +49,11 @@ void freeVector(Vector *vec)
 
 void printVector(const Vector *vec)
 {
+     if (!_checkInitVector(vec))
+    {
+        fprintf(stderr, "Vector is not initialized! Exiting...");
+        exit(EXIT_FAILURE);
+    }   
     for (size_t i = 0; i < vec->size; i++)
     {
         if (i < (vec->size - 1))

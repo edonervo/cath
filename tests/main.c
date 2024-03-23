@@ -2,6 +2,8 @@
 #include "utils.h"
 #include "testVector.h"
 #include "testMatrix.h"
+#include "testLynSys.h" 
+#include "testGrid.h"
 #include <stdlib.h>
 
 void setUp()
@@ -36,6 +38,11 @@ int main(void)
     RUN_TEST(test_matrix_free);
     RUN_TEST(test_matrix_files);
     RUN_TEST(test_matrix_algebra);
+
+    // Grid
+    test_init_grid();
+
+    // Linear System
 
     UNITY_END();
 

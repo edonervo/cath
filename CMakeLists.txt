@@ -11,8 +11,11 @@ set (SOURCES
     src/LinSys.c
     src/unity.c
     src/utils.c
+    src/FiniteDiffGrid.c
     tests/testVector.c
     tests/testMatrix.c
+    tests/testLynSys.c
+    tests/testGrid.c
     tests/main.c
 )
 
