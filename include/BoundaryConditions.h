@@ -13,6 +13,6 @@ typedef struct BoundaryConditions
 
 void setLhsDirichletBc(BoundaryConditions* bp, double lhsValue);
 void setRhsDirichletBc(BoundaryConditions* bp, double rhsValue);
-void setLhsNeumannBc  (BoundaryConditions* bp, double lhsDerivValue);
-void setRhsNeumannBc  (BoundaryConditions* bp, double rhsDerivValue);
+void setLhsNeumannBc(BoundaryConditions* bp, double lhsDerivValue);
+void setRhsNeumannBc(BoundaryConditions* bp, double rhsDerivValue);
 #endif

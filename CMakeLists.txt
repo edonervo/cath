@@ -12,6 +12,7 @@ set (SOURCES
     src/unity.c
     src/utils.c
     src/FiniteDiffGrid.c
+    src/SecondOrderOde.c
     tests/testVector.c
     tests/testMatrix.c
     tests/testLynSys.c

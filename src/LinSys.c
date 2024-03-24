@@ -29,6 +29,7 @@ void initLinSys(LinearSystem *linsys, Matrix *mat, Vector *vec)
 
     linsys->mat = mat;
     linsys->vec = vec;
+    linsys->size = vec->size;
 }
 
 void freeLinSys(LinearSystem *linsys)
@@ -55,6 +56,9 @@ void solveLinSys(LinearSystem *linsys, Vector *solution)
         exit(EXIT_FAILURE);
     }
     initVector(&m, linsys->size);
+
+    // Init solution vector
+    initVector(solution, linsys->size);
 
     // Forward sweep of Gaussian elimination
     for (size_t k = 0; k < linsys->size - 1; k++)
@@ -92,7 +96,7 @@ void solveLinSys(LinearSystem *linsys, Vector *solution)
         for (size_t i = k + 1; i < linsys->size; i++)
         {
             m.data[i] = linsys->mat->data[i][k] / linsys->mat->data[k][k];
-            for (size_t j = k; j < linsys->size; j++)
+            for (size_t j = k+1; j < linsys->size; j++)
             {
                 linsys->mat->data[i][j] -= linsys->mat->data[k][j] * m.data[i];
             }
@@ -101,7 +105,7 @@ void solveLinSys(LinearSystem *linsys, Vector *solution)
     }
 
     // back substitution
-    for (size_t i = linsys->size - 1; i > -1; i--)
+    for (int i = linsys->size - 1; i > -1; i--)
     {
         solution->data[i] = linsys->vec->data[i];
         for (size_t j = i + 1; j < linsys->size; j++)

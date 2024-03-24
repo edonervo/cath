@@ -43,6 +43,7 @@ int main(void)
     test_init_grid();
 
     // Linear System
+    RUN_TEST(test_linsys_solve);
 
     UNITY_END();
 
