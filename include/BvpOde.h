@@ -22,7 +22,7 @@ typedef struct BvpOde
     Vector* rhsVec;
     Matrix* lhsMat;
 
-    LinearSystem* lynSys;
+    LinearSystem* linSys;
 
 } BvpOde;
 

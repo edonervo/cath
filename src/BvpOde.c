@@ -31,6 +31,11 @@ void solve(BvpOde* bvpOde)
     initMatrix(bvpOde->lhsMat, bvpOde->numNodes, bvpOde->numNodes);
     populateMatrix(bvpOde);
     populateVector(bvpOde);
+    applyBoundaryConditions(bvpOde);
+
+    // Solve the linsys
+    initLinSys(bvpOde->linSys, bvpOde->lhsMat, bvpOde->rhsVec);
+    solveLinSys(bvpOde->linSys, bvpOde->solVec);
 }
 
 void populateMatrix(BvpOde* bvpOde)
@@ -72,4 +77,36 @@ void applyBoundaryConditions(BvpOde* bvpOde)
         left_bc_applied = true;
     }
 
+    if (bvpOde->bc->rhsBcIsDirichlet)
+    {
+        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-1] = 1.0;
+        bvpOde->rhsVec->data[bvpOde->numNodes-1] = bvpOde->bc->lhsBcValue;
+        right_bc_applied = true;
+    }
+
+    if (bvpOde->bc->lhsBcIsNeumann)
+    {
+        assert(left_bc_applied == false);
+        double h = bvpOde->grid->nodes[1].coordinate - 
+                   bvpOde->grid->nodes[0].coordinate;
+        bvpOde->lhsMat->data[0][0] = -1.0/h;
+        bvpOde->lhsMat->data[0][1] = 1.0/h;
+        bvpOde->rhsVec->data[0] = bvpOde->bc->lhsBcValue;
+        left_bc_applied = true;
+    }
+
+    if (bvpOde->bc->rhsBcIsNeumann)
+    {
+        assert(right_bc_applied == false);
+        double h = bvpOde->grid->nodes[bvpOde->numNodes-1].coordinate - 
+                   bvpOde->grid->nodes[bvpOde->numNodes-2].coordinate;
+        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-2] = -1.0/h;
+        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-1] = 1.0/h;
+        bvpOde->rhsVec->data[bvpOde->numNodes-1] = bvpOde->bc->rhsBcIsNeumann;
+        left_bc_applied = true;
+    }
+
+    // Check that bcs have been applied
+    assert(left_bc_applied);
+    assert(right_bc_applied);
 }
