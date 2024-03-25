@@ -4,20 +4,10 @@ cmake_minimum_required(VERSION 3.22)
 # Set Project Name
 project (cath)
 
-# Cerate a SOURCES variable with a link to all cpp files to compile
-set (SOURCES
-    src/Vector.c    
-    src/Matrix.c
-    src/LinSys.c
-    src/unity.c
-    src/utils.c
-    src/FiniteDiffGrid.c
-    src/SecondOrderOde.c
-    tests/testVector.c
-    tests/testMatrix.c
-    tests/testLynSys.c
-    tests/testGrid.c
-    tests/main.c
+# Use file(GLOB ...) to get a list of all .c files in src/ and tests/
+file(GLOB SOURCES
+    src/*.c
+    tests/*.c
 )
 
 # Add executable with above sources

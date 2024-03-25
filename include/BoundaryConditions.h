@@ -1,6 +1,8 @@
 #ifndef BOUNDARY_CONDITIONS
 #define BOUNDARY_CONDITIONS
 
+#include <stdbool.h>
+
 typedef struct BoundaryConditions
 {
     bool lhsBcIsDirichlet;

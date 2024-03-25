@@ -4,105 +4,170 @@
 #include "BvpOde.h"
 #include "assert.h"
 
-void _initBvpOde(
-    BvpOde* bvpOde,
+void initBvpOde(
+    Vector* solVec,
+    Vector* rhsVec,
+    Matrix* lhsMat,
+    LinearSystem* linSys,
     SecondOrderOde* ode,
     BoundaryConditions* bc,
-    int numNodes
-    )
-{
-    // Second order 1D differntial equation
-    bvpOde->ode;
-    // Boundary conditions
-    bvpOde->bc = bc;
-    // Other
-    bvpOde->numNodes = numNodes;
-    
-    // Set up the grid
-    FiniteDiffGrid1D grid;
-    initFiniteDiffGrid1D(&grid, bvpOde->numNodes, ode->xMin, ode->xMax);
-
-}
-
-void solve(BvpOde* bvpOde)
+    FiniteDiffGrid1D* grid,
+    int numNodes,
+    BvpOde* bvp
+    )    
 {
     // Init
-    initVector(bvpOde->rhsVec, bvpOde->numNodes);
-    initMatrix(bvpOde->lhsMat, bvpOde->numNodes, bvpOde->numNodes);
-    populateMatrix(bvpOde);
-    populateVector(bvpOde);
-    applyBoundaryConditions(bvpOde);
-
-    // Solve the linsys
-    initLinSys(bvpOde->linSys, bvpOde->lhsMat, bvpOde->rhsVec);
-    solveLinSys(bvpOde->linSys, bvpOde->solVec);
+    // Size of the 1D proble,s
+    bvp->numNodes = numNodes;
+    // Knwon and solution vector
+    initVector(solVec, bvp->numNodes);
+    initVector(rhsVec, bvp->numNodes);
+    bvp->rhsVec = rhsVec;
+    bvp->solVec = solVec;
+    // LHS Matrix
+    initMatrix(lhsMat, bvp->numNodes, bvp->numNodes);
+    bvp->lhsMat = lhsMat;
+    // Linear System to solve
+    initLinSys(linSys, bvp->lhsMat, bvp->rhsVec);
+    bvp->linSys = linSys;
+    // Init 2nd ORDER 1D diff equation
+    initSecondOrderOde(
+        ode, 
+        ode->coeffTxx, ode->coeffTx, ode->coeffT,
+        ode->rhsFunc,
+        ode->xMin, ode->xMax);
+    bvp->ode = ode;
+    // Boundary conditions
+    bvp->bc = bc;
+    // Set up the grid
+    initFiniteDiffGrid1D(grid, bvp->numNodes, bvp->ode->xMin, bvp->ode->xMax);
+    bvp->grid = grid;
 }
 
-void populateMatrix(BvpOde* bvpOde)
+void solve(BvpOde* bvp, bool verbose)
 {
-    for (size_t i=1; i<bvpOde->numNodes-1; i++)
+    // Init
+    populateMatrix(bvp);
+    populateVector(bvp);
+    applyBoundaryConditions(bvp);
+
+    // Solve the linsys
+    solveLinSys(bvp->linSys, bvp->solVec);
+
+    // Debug output
+    if (verbose)
+    {
+        printf("Matrix: \n");
+        printMatrix(bvp->lhsMat);
+        printf("---------------\n\n");
+
+        printf("Known Vector: \n");
+        printVector(bvp->rhsVec);
+        printf("---------------\n\n");
+
+        printf("Grid: \n");
+        for (size_t i=0; i<bvp->numNodes; i++)
+        {
+            if (i<bvp->numNodes - 1)
+            {
+                printf("%lf ", bvp->grid->nodes[i].coordinate);
+            } else
+            {
+                printf("%lf\n", bvp->grid->nodes[i].coordinate);
+
+            }
+        }
+        printf("---------------\n\n");
+
+        printf("Boundary Conditions: \n");
+        if (bvp->bc->lhsBcIsDirichlet)
+        {
+            printf("Lhs is Dirichlet, T = %lf K\n", bvp->bc->lhsBcValue);
+        }
+        if (bvp->bc->lhsBcIsNeumann)
+        {
+            printf("Lhs is Neumann, DT/DX = %lf\n", bvp->bc->lhsBcValue);
+        }
+        if (bvp->bc->rhsBcIsDirichlet)
+        {
+            printf("Rhs is Dirichlet, T = %lf K\n", bvp->bc->rhsBcValue);
+        }
+        if (bvp->bc->rhsBcIsNeumann)
+        {
+            printf("Rhs is Neumann, DT/DX = %lf\n", bvp->bc->rhsBcValue);
+        }
+        printf("---------------\n\n");
+
+        printf("Solution Vector: \n");
+        printVector(bvp->solVec);
+        printf("---------------\n\n");
+    }
+}
+
+void populateMatrix(BvpOde* bvp)
+{
+    for (size_t i=1; i<bvp->numNodes-1; i++)
     {
         // xm, x and xp are x(i-1), x(i) and x(i+1)
-        double xm = bvpOde->grid->nodes[i-1].coordinate;
-        double x = bvpOde->grid->nodes[i].coordinate;
-        double xp = bvpOde->grid->nodes[i+1].coordinate;
+        double xm = bvp->grid->nodes[i-1].coordinate;
+        double x = bvp->grid->nodes[i].coordinate;
+        double xp = bvp->grid->nodes[i+1].coordinate;
         double alpha = 2.0/(xp-xm)/(x-xm);
         double beta = -2.0/(xp-x)/(x-xm);
         double gamma = 2.0/(xp-xm)/(xp-x);
-        bvpOde->lhsMat->data[i][i-1] = (bvpOde->ode->coeffTxx)*alpha - (bvpOde->ode->coeffTx)/(xp-xm);
-        bvpOde->lhsMat->data[i][i] = (bvpOde->ode->coeffTxx)*beta + bvpOde->ode->coeffT;
-        bvpOde->lhsMat->data[i][i+1] = (bvpOde->ode->coeffTxx)*gamma + (bvpOde->ode->coeffTx/(xp-xm));
+        bvp->lhsMat->data[i][i-1] = (bvp->ode->coeffTxx)*alpha - (bvp->ode->coeffTx)/(xp-xm);
+        bvp->lhsMat->data[i][i] = (bvp->ode->coeffTxx)*beta + bvp->ode->coeffT;
+        bvp->lhsMat->data[i][i+1] = (bvp->ode->coeffTxx)*gamma + (bvp->ode->coeffTx/(xp-xm));
     }
-
 }
 
-void populateVector(BvpOde* bvpOde)
+void populateVector(BvpOde* bvp)
 {
-    for (size_t i=1; i<bvpOde->rhsVec->size-1; i++)  
+    for (size_t i=1; i<bvp->rhsVec->size-1; i++)  
     {
-        double x = bvpOde->grid->nodes[i].coordinate;
-        bvpOde->rhsVec->data[i] = bvpOde->ode->rhsFunc(x);
+        double x = bvp->grid->nodes[i].coordinate;
+        bvp->rhsVec->data[i] = bvp->ode->rhsFunc(x);
     }
 }
 
-void applyBoundaryConditions(BvpOde* bvpOde)
+void applyBoundaryConditions(BvpOde* bvp)
 {
     bool left_bc_applied = false;
     bool right_bc_applied = false;
 
-    if (bvpOde->bc->lhsBcIsDirichlet)
+    if (bvp->bc->lhsBcIsDirichlet)
     {
-        bvpOde->lhsMat->data[0][0] = 1.0;
-        bvpOde->rhsVec->data[0] = bvpOde->bc->lhsBcValue;
+        bvp->lhsMat->data[0][0] = 1.0;
+        bvp->rhsVec->data[0] = bvp->bc->lhsBcValue;
         left_bc_applied = true;
     }
 
-    if (bvpOde->bc->rhsBcIsDirichlet)
+    if (bvp->bc->rhsBcIsDirichlet)
     {
-        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-1] = 1.0;
-        bvpOde->rhsVec->data[bvpOde->numNodes-1] = bvpOde->bc->lhsBcValue;
+        bvp->lhsMat->data[bvp->numNodes-1][bvp->numNodes-1] = 1.0;
+        bvp->rhsVec->data[bvp->numNodes-1] = bvp->bc->rhsBcValue;
         right_bc_applied = true;
     }
 
-    if (bvpOde->bc->lhsBcIsNeumann)
+    if (bvp->bc->lhsBcIsNeumann)
     {
         assert(left_bc_applied == false);
-        double h = bvpOde->grid->nodes[1].coordinate - 
-                   bvpOde->grid->nodes[0].coordinate;
-        bvpOde->lhsMat->data[0][0] = -1.0/h;
-        bvpOde->lhsMat->data[0][1] = 1.0/h;
-        bvpOde->rhsVec->data[0] = bvpOde->bc->lhsBcValue;
+        double h = bvp->grid->nodes[1].coordinate - 
+                   bvp->grid->nodes[0].coordinate;
+        bvp->lhsMat->data[0][0] = -1.0/h;
+        bvp->lhsMat->data[0][1] = 1.0/h;
+        bvp->rhsVec->data[0] = bvp->bc->lhsBcValue;
         left_bc_applied = true;
     }
 
-    if (bvpOde->bc->rhsBcIsNeumann)
+    if (bvp->bc->rhsBcIsNeumann)
     {
         assert(right_bc_applied == false);
-        double h = bvpOde->grid->nodes[bvpOde->numNodes-1].coordinate - 
-                   bvpOde->grid->nodes[bvpOde->numNodes-2].coordinate;
-        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-2] = -1.0/h;
-        bvpOde->lhsMat->data[bvpOde->numNodes-1][bvpOde->numNodes-1] = 1.0/h;
-        bvpOde->rhsVec->data[bvpOde->numNodes-1] = bvpOde->bc->rhsBcIsNeumann;
+        double h = bvp->grid->nodes[bvp->numNodes-1].coordinate - 
+                   bvp->grid->nodes[bvp->numNodes-2].coordinate;
+        bvp->lhsMat->data[bvp->numNodes-1][bvp->numNodes-2] = -1.0/h;
+        bvp->lhsMat->data[bvp->numNodes-1][bvp->numNodes-1] = 1.0/h;
+        bvp->rhsVec->data[bvp->numNodes-1] = bvp->bc->rhsBcValue;
         left_bc_applied = true;
     }
 

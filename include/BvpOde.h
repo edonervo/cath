@@ -26,7 +26,25 @@ typedef struct BvpOde
 
 } BvpOde;
 
+void initBvpOde(
+    Vector* solVec,
+    Vector* rhsVec,
+    Matrix* lhsMat,
+    LinearSystem* linSys,
+    SecondOrderOde* ode,
+    BoundaryConditions* bc,
+    FiniteDiffGrid1D* grid,
+    int numNodes,
+    BvpOde* bvp
+    );
+    
+void solve(BvpOde* bvpOde, bool verbose);
+void populateMatrix(BvpOde* bvpOde);
 
+
+void populateVector(BvpOde* bvpOde);
+
+void applyBoundaryConditions(BvpOde* bvpOde);
 
 #endif
 

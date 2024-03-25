@@ -4,6 +4,7 @@
 #include "testMatrix.h"
 #include "testLynSys.h" 
 #include "testGrid.h"
+#include "ichtModelProblems.h"  
 #include <stdlib.h>
 
 void setUp()
@@ -46,6 +47,7 @@ int main(void)
     RUN_TEST(test_linsys_solve);
 
     // Model Problems
+    solve_icht_lab4_es1();
 
     UNITY_END();
 
