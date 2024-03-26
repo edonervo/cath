@@ -1,5 +1,7 @@
 #include "BvpOde.h" 
 #include "Plot.h"
+#include "math.h"
+#include "unity.h"
 
 double problem_rhs_lab4_es1(double x)
 {
@@ -48,6 +50,15 @@ void solve_icht_lab4_es1()
     // Solution
     solve(&bvp, false);
 
+    // Compute analytic solution for testing
+    Vector solVecExpected;
+    initVector(&solVecExpected, numNodes);
+    for (size_t i=0; i<numNodes; i++)
+    {
+        solVecExpected.data[i] = -qvol/(2 * k) * (pow(grid.nodes[i].coordinate, 2) - pow(delta, 2)) + T0;
+    }
+    // Let's tolerate a 0.5 K absolute error
+    TEST_ASSERT_DOUBLE_ARRAY_WITHIN(0.5, solVecExpected.data, solVec.data, numNodes);
     // Plotting
-    plot(&solVec, &grid);
+    // plot(&solVec, &grid);
 }

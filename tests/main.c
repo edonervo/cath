@@ -47,7 +47,7 @@ int main(void)
     RUN_TEST(test_linsys_solve);
 
     // Model Problems
-    solve_icht_lab4_es1();
+    RUN_TEST(solve_icht_lab4_es1);
 
     UNITY_END();
 
