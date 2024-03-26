@@ -1,4 +1,5 @@
 #include "BvpOde.h" 
+#include "Plot.h"
 
 double problem_rhs_lab4_es1(double x)
 {
@@ -17,7 +18,7 @@ void solve_icht_lab4_es1()
     double T0 = 300; // [K]
     
     // Discretization
-    int numNodes = 5;
+    int numNodes = 1000;
 
     // Problem structures
     Vector solVec;
@@ -44,6 +45,9 @@ void solve_icht_lab4_es1()
 
     initBvpOde(&solVec, &rhsVec, &lhsMat, &linSys, &ode, &bc, &grid, numNodes, &bvp);
 
+    // Solution
     solve(&bvp, false);
-    printVector(&solVec);
+
+    // Plotting
+    plot(&solVec, &grid);
 }
