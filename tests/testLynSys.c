@@ -21,6 +21,6 @@ void test_linsys_solve()
 
     // Init
     initLinSys(&linsys, &mat, &vec);
-    solveLinSys(&linsys, &actualSolVec);
+    solveLinSys(&linsys, &actualSolVec, "gauss", false);
     TEST_ASSERT_DOUBLE_ARRAY_WITHIN(LINSYS_TOLERANCE, expectedSolVec.data, actualSolVec.data, expectedSolVec.size);
 }

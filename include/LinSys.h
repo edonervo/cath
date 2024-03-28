@@ -15,6 +15,6 @@ typedef struct LinearSystem
 
 void initLinSys(LinearSystem* linsys, Matrix* mat, Vector* vec);
 void freeLinSys(LinearSystem *linsys);
-void solveLinSys(LinearSystem *linsys, Vector *solution);
+void solveLinSys(LinearSystem *linsys, Vector *solution, char* method, bool verbose);
 
 #endif

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 
 void initLinSys(LinearSystem *linsys, Matrix *mat, Vector *vec)
 {
@@ -47,9 +48,9 @@ void freeLinSys(LinearSystem *linsys)
     linsys->vec = NULL;
 }
 
-void solveLinSys(LinearSystem *linsys, Vector *solution)
+void _GaussEliminationMethod(LinearSystem *linsys, Vector *solution)
 {
-    Vector m; // TODO: what is this?
+        Vector m; // TODO: what is this?
     if (solution->data == NULL)
     {
         fprintf(stderr, "Solution Vector is not initialized!\n");
@@ -113,5 +114,117 @@ void solveLinSys(LinearSystem *linsys, Vector *solution)
             solution->data[i] -= linsys->mat->data[i][j] * solution->data[j];
         }
         solution->data[i] /= linsys->mat->data[i][i];
+    }
+}
+
+void _thomasAlgorithm(LinearSystem *linsys, Vector *solution, bool verbose)
+{
+    // Assume Tridiagonal Matrix
+    // Diagonals
+    Vector low_diag; // lower diag 
+    Vector main_diag; // main diag
+    Vector upper_diag; // upper diag
+    initVector(&low_diag, linsys->size);
+    initVector(&main_diag, linsys->size);
+    initVector(&upper_diag, linsys->size);
+
+    // Aux vectors
+    Vector alpha;
+    Vector beta;
+    Vector y;
+    initVector(&alpha, linsys->size);
+    initVector(&beta, linsys->size);
+    initVector(&y, linsys->size);
+
+    // Solution
+    initVector(solution, linsys->size);
+
+    // Extract Vectors from matrix
+    for (size_t i=0; i<linsys->size; i++)
+    {
+        if (i == 0)
+        {
+            // first row
+            main_diag.data[i] = linsys->mat->data[i][i];
+            upper_diag.data[i] = linsys->mat->data[i][i+1];
+        }
+        else if ((i > 0) && (i < linsys->size-1))
+        {
+            main_diag.data[i] = linsys->mat->data[i][i];
+            upper_diag.data[i] = linsys->mat->data[i][i+1];
+            low_diag.data[i] = linsys->mat->data[i][i-1];
+        } else
+        {
+            main_diag.data[i] = linsys->mat->data[i][i];
+            low_diag.data[i] = linsys->mat->data[i][i-1];
+        }
+    }
+
+    if (verbose)
+    {
+        // print debug info
+        printf("Matrix: \n");
+        printMatrix(linsys->mat);
+        printf("-------------------------\n\n");
+
+        printf("Known Vector: \n");
+        printVector(linsys->vec);
+        printf("-------------------------\n\n");
+
+        printf("Low Diag: \n");
+        printVector(&low_diag);
+        printf("-------------------------\n\n");
+
+        printf("Main diag: \n");
+        printVector(&main_diag);
+        printf("-------------------------\n\n");
+
+        printf("Upper Diag: \n");
+        printVector(&upper_diag);
+        printf("-------------------------\n\n");
+
+    }
+
+    // Solve
+    alpha.data[0] = main_diag.data[0];
+    y.data[0] = linsys->vec->data[0];
+
+    for (size_t i = 1; i<linsys->size; i++)
+    {
+        // alpha.data[i] = alpha.data[i-1] - ((low_diag.data[i] * upper_diag.data[i-1]) / alpha.data[i-1]);
+        beta.data[i] = low_diag.data[i] / alpha.data[i-1];
+        alpha.data[i] = main_diag.data[i] - beta.data[i]*upper_diag.data[i-1];
+        y.data[i] = linsys->vec->data[i] - beta.data[i]*y.data[i-1];
+    }
+
+    solution->data[linsys->size-1] = y.data[linsys->size-1] / alpha.data[linsys->size-1];
+    for (size_t i=linsys->size - 2; i=0; i--)
+    {
+        solution->data[i] = (y.data[i] - upper_diag.data[i]*solution->data[i+1]) / alpha.data[i];
+    }
+
+    freeVector(&low_diag);
+    freeVector(&main_diag);
+    freeVector(&upper_diag);
+    freeVector(&alpha);
+    freeVector(&beta);
+    freeVector(&y);
+}
+
+void solveLinSys(LinearSystem *linsys, Vector *solution, char* method, bool verbose)
+{
+    // TODO: SolveLinSys should be able to identify best alg for the matrix
+    if (strcmp(method, "gauss") == 0) 
+    {
+        _GaussEliminationMethod(linsys, solution);
+    } 
+    else if (strcmp(method, "thomas") == 0)
+    {
+        _thomasAlgorithm(linsys, solution, verbose);
+    }
+    else
+    {
+        fprintf(stderr, "Method not available, exiting...\n");
+        exit(EXIT_FAILURE);
     }
 }

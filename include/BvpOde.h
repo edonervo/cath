@@ -38,7 +38,7 @@ void initBvpOde(
     BvpOde* bvp
     );
     
-void solve(BvpOde* bvpOde, bool verbose);
+void solve(BvpOde* bvpOde, char* method, bool verbose);
 void populateMatrix(BvpOde* bvpOde);
 
 

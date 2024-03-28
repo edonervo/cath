@@ -44,7 +44,7 @@ void initBvpOde(
     bvp->grid = grid;
 }
 
-void solve(BvpOde* bvp, bool verbose)
+void solve(BvpOde* bvp, char* method, bool verbose)
 {
     // Init
     populateMatrix(bvp);
@@ -52,7 +52,7 @@ void solve(BvpOde* bvp, bool verbose)
     applyBoundaryConditions(bvp);
 
     // Solve the linsys
-    solveLinSys(bvp->linSys, bvp->solVec);
+    solveLinSys(bvp->linSys, bvp->solVec, method, verbose);
 
     // Debug output
     if (verbose)
